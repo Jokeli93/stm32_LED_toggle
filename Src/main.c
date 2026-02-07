@@ -17,6 +17,7 @@
  */
 
 #include <stdint.h>
+#include "main.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -25,27 +26,26 @@
 int main(void)
 {
 	//Address of the clock control register (AHB1ENR)
-	uint32_t *pClk = (uint32_t*)0x40023830;
+	RCC_AHB1ENR_t volatile *const pClk = (RCC_AHB1ENR_t*)0x40023830;
 	//Address of the GPIOD mode register (used to control the mode)
-	uint32_t *pClkModeReg = (uint32_t*)0x40020C00;
+	GPIOx_MODER_t volatile *const pClkModeReg = (GPIOx_MODER_t*)0x40020C00;
 	//Address of the GPIOD output data register (use to write)
-	uint32_t *pClkOutDataReg = (uint32_t*)0x40020C14;
+	GPIOx_ODR_t volatile *const pClkOutDataReg =(GPIOx_ODR_t*)0x40020C14;
 
 	//1. Enable the clock for  GPIO peripheral for AHB1ENR
-	*pClk = *pClk | (1 << 3); //set the 3'th bit
+	pClk->gpiod_en = 1; //set the 3'th bit
 
 	//2. Configure the mode of the IO pin as output
-	*pClkModeReg &= ~(3 << 24); //clear the 24'th and 25'th bit position
-	*pClkModeReg |= (1 << 24); //make 24'th bit position to 1
+	pClkModeReg->pin_12 = 1; //  set the 24'th bit
 
 	while(1)
 	{
 		//3. Set the 12'th bit of the output data register to make I/O pin12 as HIGH
-		*pClkOutDataReg |= (1<<12);
+		pClkOutDataReg->pin_12 = 1;
 		//introducing of a small observable delay with a loop
 		for(uint32_t i = 0; i < 300000; i++);
 		//Turn off the LED (clear the 12'th bit of the output data register)
-		*pClkOutDataReg &= ~(1<<12);
+		pClkOutDataReg->pin_12 = 0;
 		//introducing of a small observable delay with a loop
 		for(uint32_t i = 0; i < 300000; i++);
 	}
