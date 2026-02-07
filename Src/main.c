@@ -32,20 +32,20 @@ int main(void)
 	uint32_t *pClkOutDataReg = (uint32_t*)0x40020C14;
 
 	//1. Enable the clock for  GPIO peripheral for AHB1ENR
-	*pClk = *pClk | 0x08; //set the 3'th bit
+	*pClk = *pClk | (1 << 3); //set the 3'th bit
 
 	//2. Configure the mode of the IO pin as output
-	*pClkModeReg &= ~(0x03000000); //clear the 24'th and 25'th bit position
-	*pClkModeReg |= 0x01000000; //make 24'th bit position to 1
+	*pClkModeReg &= ~(3 << 24); //clear the 24'th and 25'th bit position
+	*pClkModeReg |= (1 << 24); //make 24'th bit position to 1
 
 	while(1)
 	{
 		//3. Set the 12'th bit of the output data register to make I/O pin12 as HIGH
-		*pClkOutDataReg |= 0x1000;
+		*pClkOutDataReg |= (1<<12);
 		//introducing of a small observable delay with a loop
 		for(uint32_t i = 0; i < 300000; i++);
 		//Turn off the LED (clear the 12'th bit of the output data register)
-		*pClkOutDataReg &= ~(0x1000);
+		*pClkOutDataReg &= ~(1<<12);
 		//introducing of a small observable delay with a loop
 		for(uint32_t i = 0; i < 300000; i++);
 	}
