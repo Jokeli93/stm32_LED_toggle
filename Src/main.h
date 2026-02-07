@@ -7,7 +7,10 @@
 
 #ifndef MAIN_H_
 #define MAIN_H_
+
 #include<stdint.h>
+
+void delay_ms(const uint32_t * const, uint32_t);
 
 typedef struct {
 	uint32_t gpioa_en:1;

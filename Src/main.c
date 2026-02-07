@@ -25,6 +25,19 @@
 
 int main(void)
 {
+	//1. Pointer declaration on the SysTick Registers
+	uint32_t *STK_CTRL = (uint32_t *)0xE000E010;// SYST_CSR (SysTick Control  and  Status Register)
+	uint32_t *STK_LOAD = (uint32_t *)0xE000E014;// SYST_RVR (Reload Value Register)
+	uint32_t *STK_VAL  = (uint32_t *)0xE000E018;// SYST_CVR (Control Value Register)
+
+	//2. Initialization of the SysTick Registers
+	//Set Reload Value
+	*STK_LOAD = 16000 - 1;// CPU = 16MHz => 16000 tacks for 1 ms (count 0 -> 15999)
+	//Reset the counter value
+	*STK_VAL = 0;
+	//Enable the SysTick features
+	*STK_CTRL = (1 << 0) | (1 << 2);
+
 	//Address of the clock control register (AHB1ENR)
 	RCC_AHB1ENR_t volatile *const pClk = (RCC_AHB1ENR_t*)0x40023830;
 	//Address of the GPIOD mode register (used to control the mode)
@@ -42,11 +55,11 @@ int main(void)
 	{
 		//3. Set the 12'th bit of the output data register to make I/O pin12 as HIGH
 		pClkOutDataReg->pin_12 = 1;
-		//introducing of a small observable delay with a loop
-		for(uint32_t i = 0; i < 300000; i++);
+		//function implementing the delay using the SiysTick Timer in Cortex-M core
+		delay_ms(STK_CTRL, 500);
 		//Turn off the LED (clear the 12'th bit of the output data register)
 		pClkOutDataReg->pin_12 = 0;
-		//introducing of a small observable delay with a loop
-		for(uint32_t i = 0; i < 300000; i++);
+		//function implementing the delay using the SiysTick Timer in Cortex-M core
+		delay_ms(STK_CTRL, 500);
 	}
 }

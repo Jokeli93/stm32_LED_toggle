@@ -90,6 +90,7 @@ Src/
 
 Startup/  
 → MCU startup files and linker-related configuration
+
 Note:  
 This repository contains only the relevant source files.  
 Build artifacts and IDE-specific files are excluded using .gitignore.
