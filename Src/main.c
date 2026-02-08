@@ -25,18 +25,22 @@
 
 int main(void)
 {
-	//1. Pointer declaration on the SysTick Registers
+	//1. Pointer declarations on the SysTick Registers
+
 	uint32_t *STK_CTRL = (uint32_t *)0xE000E010;// SYST_CSR (SysTick Control  and  Status Register)
 	uint32_t *STK_LOAD = (uint32_t *)0xE000E014;// SYST_RVR (Reload Value Register)
 	uint32_t *STK_VAL  = (uint32_t *)0xE000E018;// SYST_CVR (Control Value Register)
 
 	//2. Initialization of the SysTick Registers
+
 	//Set Reload Value
 	*STK_LOAD = 16000 - 1;// CPU = 16MHz => 16000 tacks for 1 ms (count 0 -> 15999)
 	//Reset the counter value
 	*STK_VAL = 0;
 	//Enable the SysTick features
 	*STK_CTRL = (1 << 0) | (1 << 2);
+
+	//3. Pointer declarations on the GPIO and AHB1ENR peripheral Registers
 
 	//Address of the clock control register (AHB1ENR)
 	RCC_AHB1ENR_t volatile *const pClk = (RCC_AHB1ENR_t*)0x40023830;
@@ -45,19 +49,21 @@ int main(void)
 	//Address of the GPIOD output data register (use to write)
 	GPIOx_ODR_t volatile *const pClkOutDataReg =(GPIOx_ODR_t*)0x40020C14;
 
-	//1. Enable the clock for  GPIO peripheral for AHB1ENR
+	//4. Enable the clock for  GPIO peripheral for AHB1ENR
 	pClk->gpiod_en = 1; //set the 3'th bit
 
-	//2. Configure the mode of the IO pin as output
+	//5. Configure the mode of the IO pin as output
 	pClkModeReg->pin_12 = 1; //  set the 24'th bit
 
 	while(1)
 	{
-		//3. Set the 12'th bit of the output data register to make I/O pin12 as HIGH
+	//6. Set the 12'th bit of the output data register to make I/O pin12 as HIGH
 		pClkOutDataReg->pin_12 = 1;
-		//function implementing the delay using the SiysTick Timer in Cortex-M core
+
+	//7. function implementing the delay using the SiysTick Timer in Cortex-M core
 		delay_ms(STK_CTRL, 500);
-		//Turn off the LED (clear the 12'th bit of the output data register)
+
+	//8. Turn off the LED (clear the 12'th bit of the output data register)
 		pClkOutDataReg->pin_12 = 0;
 		//function implementing the delay using the SiysTick Timer in Cortex-M core
 		delay_ms(STK_CTRL, 500);

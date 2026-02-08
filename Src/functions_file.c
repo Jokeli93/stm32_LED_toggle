@@ -7,7 +7,7 @@
 
 #include "main.h"
 
-//Function to implement the delay using the SiysTick Timer in Cortex-M core
+//Function to implement the delay using the SysTick Timer in Cortex-M core
 void delay_ms(const uint32_t * const ptr_countflag, uint32_t ms)
 {
 	for (uint32_t i = 0; i < ms; i++)
