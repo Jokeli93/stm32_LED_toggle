@@ -1,4 +1,4 @@
-name: STM32 CI
+name: STM32 Build
 
 on: push
 
@@ -9,9 +9,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install ARM GCC
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi
+          sudo apt-get install -y gcc-arm-none-eabi make openjdk-17-jre
 
-      - run: arm-none-eabi-gcc --version
+      - name: Build
+        run: |
+          ./STM32CubeIDE \
+          --launcher.suppressErrors \
+          -nosplash \
+          -application org.eclipse.cdt.managedbuilder.core.headlessbuild \
+          -data workspace \
+          -importAll . \
+          -build all
